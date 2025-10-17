@@ -1,24 +1,13 @@
-pipeline {
-    agent any
-    
-    stages {
-        stage('SCM Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-        
-        stage('SonarQube Analysis') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    script {
-                        def scannerHome = tool 'SonarScanner'
-                        withSonarQubeEnv('SonarQube') {
-                            sh "${scannerHome}/bin/sonar-scanner"
-                        }
-                    }
-                }
-            }
+stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv('SonarQube') {
+            sh '''
+                sonar-scanner \
+                -Dsonar.projectKey=your-project-key \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=${SONAR_HOST_URL} \
+                -Dsonar.login=${SONAR_AUTH_TOKEN}
+            '''
         }
     }
 }
